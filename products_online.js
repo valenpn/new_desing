@@ -637,6 +637,11 @@ function blockIntroRoutineBegin(snapshot) {
     t = 0; frameN = -1; continueRoutine = true; routineForceEnded = false;
     blockIntroClock.reset(); routineTimer.reset(); blockIntroMaxDurationReached = false;
 
+    // Safety net
+    const _bi = snapshot.getCurrentTrial ? snapshot.getCurrentTrial() : {};
+    if (typeof block_num === 'undefined' || block_num === null) block_num = _bi.block_num || 0;
+    if (typeof block_question === 'undefined' || block_question === null) block_question = _bi.block_question || '';
+
     let showBlockIntro = (block_num !== lastSeenBlockNum);
     if (!showBlockIntro) {
       continueRoutine = false;
@@ -713,21 +718,22 @@ function main_loopLoopBegin(main_loopLoopScheduler, snapshot) {
     psychoJS.experiment.addLoop(main_loop);
     currentLoop = main_loop;
     for (const thisMain_loop of main_loop) {
-      snapshot = main_loop.getSnapshot();
-      main_loopLoopScheduler.add(importConditions(snapshot));
-      main_loopLoopScheduler.add(blockIntroRoutineBegin(snapshot));
+      // Capture snapshot in block-scoped const to avoid closure-over-loop-variable bug
+      const trialSnapshot = main_loop.getSnapshot();
+      main_loopLoopScheduler.add(importConditions(trialSnapshot));
+      main_loopLoopScheduler.add(blockIntroRoutineBegin(trialSnapshot));
       main_loopLoopScheduler.add(blockIntroRoutineEachFrame());
-      main_loopLoopScheduler.add(blockIntroRoutineEnd(snapshot));
-      main_loopLoopScheduler.add(fixationRoutineBegin(snapshot));
+      main_loopLoopScheduler.add(blockIntroRoutineEnd(trialSnapshot));
+      main_loopLoopScheduler.add(fixationRoutineBegin(trialSnapshot));
       main_loopLoopScheduler.add(fixationRoutineEachFrame());
-      main_loopLoopScheduler.add(fixationRoutineEnd(snapshot));
-      main_loopLoopScheduler.add(ratingTrialRoutineBegin(snapshot));
+      main_loopLoopScheduler.add(fixationRoutineEnd(trialSnapshot));
+      main_loopLoopScheduler.add(ratingTrialRoutineBegin(trialSnapshot));
       main_loopLoopScheduler.add(ratingTrialRoutineEachFrame());
-      main_loopLoopScheduler.add(ratingTrialRoutineEnd(snapshot));
-      main_loopLoopScheduler.add(memoryTrialRoutineBegin(snapshot));
+      main_loopLoopScheduler.add(ratingTrialRoutineEnd(trialSnapshot));
+      main_loopLoopScheduler.add(memoryTrialRoutineBegin(trialSnapshot));
       main_loopLoopScheduler.add(memoryTrialRoutineEachFrame());
-      main_loopLoopScheduler.add(memoryTrialRoutineEnd(snapshot));
-      main_loopLoopScheduler.add(main_loopLoopEndIteration(main_loopLoopScheduler, snapshot));
+      main_loopLoopScheduler.add(memoryTrialRoutineEnd(trialSnapshot));
+      main_loopLoopScheduler.add(main_loopLoopEndIteration(main_loopLoopScheduler, trialSnapshot));
     }
     return Scheduler.Event.NEXT;
   };
@@ -809,6 +815,20 @@ function ratingTrialRoutineBegin(snapshot) {
     t = 0; frameN = -1; continueRoutine = true; routineForceEnded = false;
     ratingTrialClock.reset(); routineTimer.reset(); ratingTrialMaxDuration = false;
 
+    // Directly read trial fields from the current trial object as a safety net,
+    // in case importAttributes did not set globals yet.
+    const _trial = snapshot.getCurrentTrial ? snapshot.getCurrentTrial() : {};
+    if (typeof image_path === 'undefined' || image_path === null || image_path === '')
+      image_path = _trial.image_path || 'default.png';
+    if (typeof block_question === 'undefined' || block_question === null)
+      block_question = _trial.block_question || 'liking';
+    if (typeof block_num === 'undefined' || block_num === null)
+      block_num = _trial.block_num || 0;
+    if (typeof block_image_version === 'undefined' || block_image_version === null)
+      block_image_version = _trial.block_image_version || '';
+    if (typeof product_id === 'undefined' || product_id === null)
+      product_id = _trial.product_id || '';
+
     let question_map = {
       liking: ["liking", "How much do you LIKE the product?"],
       taste:  ["taste",  "How TASTY do you think the product is?"],
@@ -832,7 +852,11 @@ function ratingTrialRoutineBegin(snapshot) {
 
     waiting_next_question = false; timeout_warning = false; click_ready = false;
     questionClock.reset(); delayClock.reset();
-    productImage.setImage(image_path);
+    // Guard: ensure image_path is a valid string before setting
+    const safe_image_path = (typeof image_path === 'string' && image_path.length > 0)
+      ? image_path
+      : 'default.png';
+    productImage.setImage(safe_image_path);
 
     ratingMouse.x = []; ratingMouse.y = []; ratingMouse.leftButton = [];
     ratingMouse.midButton = []; ratingMouse.rightButton = []; ratingMouse.time = [];
@@ -969,6 +993,17 @@ function memoryTrialRoutineBegin(snapshot) {
     TrialHandler.fromSnapshot(snapshot);
     t = 0; frameN = -1; continueRoutine = true; routineForceEnded = false;
     memoryTrialClock.reset(); routineTimer.reset(); memoryTrialMaxDurationReached = false;
+
+    // Safety net: read directly from trial object if globals not set
+    const _mt = snapshot.getCurrentTrial ? snapshot.getCurrentTrial() : {};
+    if (typeof is_memory_trial_position === 'undefined' || is_memory_trial_position === null)
+      is_memory_trial_position = _mt.is_memory_trial_position || 0;
+    if (typeof product_id === 'undefined' || product_id === null)
+      product_id = _mt.product_id || '';
+    if (typeof memory_target_product === 'undefined' || memory_target_product === null)
+      memory_target_product = _mt.memory_target_product || '';
+    if (typeof block_num === 'undefined' || block_num === null)
+      block_num = _mt.block_num || 0;
 
     // show_memory = true only at the designated catch-trial position
     show_memory = (is_memory_trial_position === 1);
