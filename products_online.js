@@ -181,7 +181,7 @@ async function experimentInit() {
   instructionsClock = new util.Clock();
   text_instructions = new visual.TextStim({
     win: psychoJS.window, name: 'text_instructions',
-    text: 'INSTRUCTIONS:\nYou will complete various blocks.\n\nIn each block, you will answer only ONE type of question:\n- How much do you LIKE the product?\n- How TASTY do you think the product is?\n- How HEALTHY do you think the product is?\n\nBefore each block, you will see which question to answer.\n\nRate each product from 0 (not at all) to 7 (very much).\nUse the mouse to move the slider and click to confirm.\nYou will have 8 seconds for each product.\n\nPress SPACE to begin the experiment',
+    text: 'INSTRUCTIONS:\nYou will complete various blocks.\n\nIn each block, you will answer only ONE type of question:\n \n\nBefore each block, you will see which question to answer.\n\nRate each product from 0 (not at all) to 7 (very much).\nUse the mouse to move the slider and click to confirm.\nYou will have 8 seconds for each product.\n\nPress SPACE to begin the experiment',
     font: 'Arial', pos: [0, 0], draggable: false, height: 0.035, wrapWidth: 1.3,
     languageStyle: 'LTR', color: new util.Color('white'), depth: 0.0
   });
@@ -194,7 +194,7 @@ async function experimentInit() {
   blockIntroClock = new util.Clock();
   blockIntroText = new visual.TextStim({
     win: psychoJS.window, name: 'blockIntroText', text: '',
-    font: 'Arial', pos: [0, 0], draggable: false, height: 0.045, wrapWidth: 1.2,
+    font: 'Arial', pos: [0, 0], draggable: false, height: 0.038, wrapWidth: 2.0,
     languageStyle: 'LTR', color: new util.Color('white'), depth: 0.0
   });
   blockIntroKey = new core.Keyboard({ psychoJS, clock: new util.Clock(), waitForStart: true });
@@ -649,11 +649,11 @@ function blockIntroRoutineBegin(snapshot) {
       lastSeenBlockNum = block_num;
       let introText = "";
       if (block_question === "liking")
-        introText = "In the next block, rate how much you LIKE each product.\n\nPress SPACE to begin.";
+        introText = "Next block: How much do you LIKE each product?\n\nPress SPACE to begin.";
       else if (block_question === "taste")
-        introText = "In the next block, rate how TASTY you think each product is.\n\nPress SPACE to begin.";
+        introText = "Next block: How TASTY do you think each product is?\n\nPress SPACE to begin.";
       else if (block_question === "health")
-        introText = "In the next block, rate how HEALTHY you think each product is.\n\nPress SPACE to begin.";
+        introText = "Next block: How HEALTHY do you think each product is?\n\nPress SPACE to begin.";
       blockIntroText.setText(introText);
       blockIntroKey.keys = undefined; blockIntroKey.rt = undefined; _blockIntroKey_allKeys = [];
     }
