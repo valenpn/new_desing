@@ -14,8 +14,8 @@ const { round } = util;
 
 let expName = 'products_online';
 let expInfo = {
-    'participant_ID': '',
-    'age': '',
+    'prolific_ID': '',
+    'age': '',,
 };
 let PILOTING = util.getUrlParameters().has('__pilotToken');
 
@@ -127,11 +127,11 @@ async function updateInfo() {
   else
     frameDur = 1.0 / 60.0;
   util.addInfoFromUrl(expInfo);
-  if (!expInfo['participant_ID'] || !expInfo['age']) {
+  if (!expInfo['prolific_ID'] || !expInfo['age']) {
     psychoJS.quit({ message: 'Please enter participant ID and age before continuing.', isCompleted: false });
     return Scheduler.Event.QUIT;
   }
-  psychoJS.experiment.dataFileName = (("." + "/") + `data/${expInfo["participant_ID"]}/${expInfo["participant_ID"]}_${expName}_${expInfo["date"].split("_")[0]}`);
+  psychoJS.experiment.dataFileName = (("." + "/") + `data/${expInfo["prolific_ID"]}/${expInfo["prolific_ID"]}_${expName}_${expInfo["date"].split("_")[0]}`);
   psychoJS.experiment.field_separator = '\t';
   return Scheduler.Event.NEXT;
 }
@@ -1206,7 +1206,7 @@ async function uploadToDataPipe(csvText, filename) {
   return result;
 }
 function makeUploadFilename() {
-  const pid = expInfo["participant_ID"] || "noID";
+  const pid = expInfo["prolific_ID"] || "noID";
   const dateStr = (expInfo["date"] || "nodate").split("_")[0];
   const rand = Math.random().toString(36).slice(2, 10);
   return `${pid}_${dateStr}_${rand}.csv`;
