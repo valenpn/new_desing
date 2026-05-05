@@ -15,7 +15,7 @@ const { round } = util;
 let expName = 'products_online';
 let expInfo = {
     'prolific_ID': '',
-    'age': '',,
+    'age': '',
 };
 let PILOTING = util.getUrlParameters().has('__pilotToken');
 
