@@ -14,7 +14,6 @@ const { round } = util;
 
 let expName = 'products_online';
 let expInfo = {
-    'prolific_ID': '',
     'age': '',
 };
 let PILOTING = util.getUrlParameters().has('__pilotToken');
@@ -127,11 +126,11 @@ async function updateInfo() {
   else
     frameDur = 1.0 / 60.0;
   util.addInfoFromUrl(expInfo);
-  if (!expInfo['prolific_ID'] || !expInfo['age']) {
+  if (!expInfo['PROLIFIC_PID']) {
     psychoJS.quit({ message: 'Please enter participant ID and age before continuing.', isCompleted: false });
     return Scheduler.Event.QUIT;
   }
-  psychoJS.experiment.dataFileName = (("." + "/") + `data/${expInfo["prolific_ID"]}/${expInfo["prolific_ID"]}_${expName}_${expInfo["date"].split("_")[0]}`);
+  psychoJS.experiment.dataFileName = (("." + "/") + `data/${expInfo["PROLIFIC_PID"]}/${expInfo["PROLIFIC_PID"]}_${expName}_${expInfo["date"].split("_")[0]}`);
   psychoJS.experiment.field_separator = '\t';
   return Scheduler.Event.NEXT;
 }
@@ -1206,7 +1205,7 @@ async function uploadToDataPipe(csvText, filename) {
   return result;
 }
 function makeUploadFilename() {
-  const pid = expInfo["prolific_ID"] || "noID";
+  const pid = expInfo["PROLIFIC_PID"] || "noID";
   const dateStr = (expInfo["date"] || "nodate").split("_")[0];
   const rand = Math.random().toString(36).slice(2, 10);
   return `${pid}_${dateStr}_${rand}.csv`;
@@ -1223,7 +1222,11 @@ async function quitPsychoJS(message, isCompleted) {
     document.body.innerHTML = `<div style="font-family:Arial,sans-serif;text-align:center;padding-top:80px;font-size:28px;color:white;background:black;height:100vh;">Your data were saved successfully.<br><br>You may now close this page.</div>`;
     psychoJS.window.close();
     psychoJS.quit({ message, isCompleted });
+    if (isCompleted) {
+      window.location.href = "https://app.prolific.com/submissions/complete?cc=YOUR_CODE";
+    }
     return Scheduler.Event.QUIT;
+  
   } catch (err) {
     console.error("Upload failed:", err);
     document.body.innerHTML = `<div style="font-family:Arial,sans-serif;text-align:center;padding-top:80px;font-size:24px;color:white;background:black;height:100vh;">There was a problem saving your data.<br><br>Please contact the researcher.<br><br>Error: ${err.message}</div>`;
